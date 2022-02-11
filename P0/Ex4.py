@@ -1,7 +1,5 @@
 import Seq0
-filename = Seq0.valid_filename()
-A,C,G,T = Seq0.seq_count_base(filename)
-print("""Number of A's in """ + filename + " "+ str(A) + "\n" +
-""" Number of C's in """ + filename + " " + str(C) + "\n" +
-""" Number of G's in """ + filename + " " + str(G) + "\n" +
-""" Number of T's in """ + filename + " " + str(T))
+gene_list = ["U5", "FRAT1", "ADA", "FXN", "RNU6_269P"]
+for l in gene_list:
+    print("Gene " + l +":\n" + "A: " + str(list(Seq0.seq_count_base(l))[0]) + "\n C: " + str(list(Seq0.seq_count_base(l))[1])
+    + "\n G: " + str(list(Seq0.seq_count_base(l))[2])+ "\n T: " + str(list(Seq0.seq_count_base(l))[3]))
