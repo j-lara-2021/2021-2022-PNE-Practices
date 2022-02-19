@@ -95,4 +95,37 @@ class Seq:
             reverse_str = self.strbases[::-1]
         else:
             reverse_str = self
+
         return reverse_str
+
+    def comp_str(self):
+        comp_str = ""
+        if self.strbases != "ERROR" and self.strbases != "NULL":
+            for i in self.strbases:
+                if i == "A":
+                    comp_str = comp_str + "T"
+                elif i == "T":
+                    comp_str = comp_str + "A"
+                elif i == "C":
+                    comp_str = comp_str + "G"
+                elif i == "G":
+                    comp_str = comp_str + "C"
+        else:
+            comp_str = self
+        return comp_str
+
+    def valid_filename():
+        exit = False
+        while not exit:
+            filename = input("What file do you want to open?:")
+            try:
+                f = open("../P0/Session04/" + filename + ".txt", "r")
+                exit = True
+                return filename
+            except FileNotFoundError:
+                print("FIle does not exist.")
+
+    def seq_read_fasta(filename):
+        seq = open("../P0/Session04/" + filename + ".txt", "r").read()
+        seq = seq[seq.find("\n"):].replace("\n", "")
+        return seq
