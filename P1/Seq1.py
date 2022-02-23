@@ -125,7 +125,8 @@ class Seq:
             except FileNotFoundError:
                 print("FIle does not exist.")
 
-    def seq_read_fasta(filename):
+    def seq_read_fasta(self, filename):
         seq = open("../P0/Session04/" + filename + ".txt", "r").read()
         seq = seq[seq.find("\n"):].replace("\n", "")
-        return seq
+        self.strbases = seq
+
