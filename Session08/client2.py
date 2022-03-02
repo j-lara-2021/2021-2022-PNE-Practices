@@ -4,8 +4,8 @@ import colorama
 
 
 # SERVER IP, PORT
-PORT = 21000
-IP = "212.128.253.64"
+PORT = 8000
+IP = "10.3.46.157"
 
 # First, create the socket
 # We will always use this parameters: AF_INET y SOCK_STREAM

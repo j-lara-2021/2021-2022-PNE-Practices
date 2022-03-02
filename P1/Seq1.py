@@ -114,7 +114,7 @@ class Seq:
             comp_str = self
         return comp_str
 
-    def valid_filename():
+    def valid_filename(self):
         exit = False
         while not exit:
             filename = input("What file do you want to open?:")
