@@ -57,35 +57,28 @@ class Seq:
         G = 0
         T = 0
         if self.strbases != "ERROR" and self.strbases != "NULL":
-            for i in self.strbases:
-                if i == "A":
-                    A += 1
-                elif i == "C":
-                    C += 1
-                elif i == "G":
-                    G += 1
-                elif i == "T":
-                    T += 1
+            A = self.strbases.count("A")
+            T = self.strbases.count("T")
+            C = self.strbases.count("C")
+            G = self.strbases.count("G")
         else:
             pass
-        #print(f"A: {A},   C: {C},   T: {T},   G: {G},")
+
         return A, C, T, G
 
     def count_base_dict(self):
-        base_dict = {"A": 0, "T": 0, "C": 0, "G": 0,}
+        base_dict = {}
+        A = self.strbases.count("A")
+        T = self.strbases.count("T")
+        C = self.strbases.count("C")
+        G = self.strbases.count("G")
         if self.strbases != "ERROR" and self.strbases != "NULL":
-            for i in self.strbases:
-                if i == "A":
-                    base_dict["A"] += 1
-                elif i == "C":
-                    base_dict["C"] += 1
-                elif i == "G":
-                    base_dict["G"] += 1
-                elif i == "T":
-                    base_dict["T"] += 1
+            base_dict["A"] = A
+            base_dict["C"] = C
+            base_dict["T"] = T
+            base_dict["G"] = G
         else:
             pass
-        #print(f"A: {A},   C: {C},   T: {T},   G: {G},")
         return base_dict
 
 
@@ -99,20 +92,11 @@ class Seq:
         return reverse_str
 
     def comp_str(self):
-        comp_str = ""
         if self.strbases != "ERROR" and self.strbases != "NULL":
-            for i in self.strbases:
-                if i == "A":
-                    comp_str = comp_str + "T"
-                elif i == "T":
-                    comp_str = comp_str + "A"
-                elif i == "C":
-                    comp_str = comp_str + "G"
-                elif i == "G":
-                    comp_str = comp_str + "C"
+            comp = self.strbases.replace('C', 'g').replace("G", "c").replace("A", "t").replace("T", "a").upper()
         else:
-            comp_str = self
-        return comp_str
+            comp = self
+        return comp
 
     def valid_filename(self):
         exit = False
