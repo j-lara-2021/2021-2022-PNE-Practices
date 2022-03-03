@@ -17,16 +17,20 @@ c = Client(IP, PORT)
 print(c)
 
 genes = ["U5", "FRAT1", "ADA", "FXN", "RNU6_269P"]
-for i in range(0,len(genes)):
-    filename = genes[i]
-    i = Seq()
-    print("To Server:")
-    termcolor.cprint(f"Sending {filename} to the server...", "blue")
+for i in genes:
+    m = Seq()
+    m.seq_read_fasta(i)
+
+    print("To Server:", end = " ")
+    termcolor.cprint(f"Sending {i} to the server...", "blue")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((IP, PORT))
-    s.send(str.encode(f"Sending {filename} to the server..."))
+    s.send(str.encode(f"Sending {i} to the server..."))
     msg = s.recv(2048)
+    c.talk(m.strbases)
+    print("From Server:", end = " ")
+    termcolor.cprint(msg.decode("utf-8"), "red")
+    print("To Server:", end = " ")
+    termcolor.cprint(m, "cyan")
     print("From Server:")
     termcolor.cprint(msg.decode("utf-8"), "green")
-    print("To Server:")
-    termcolor.cprint(i.seq_read_fasta(filename), "cyan")
