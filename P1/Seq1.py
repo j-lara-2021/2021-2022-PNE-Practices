@@ -97,8 +97,8 @@ class Seq:
         else:
             comp = self
         return comp
-
-    def valid_filename(self):
+    @staticmethod
+    def valid_filename():
         exit = False
         while not exit:
             filename = input("What file do you want to open?:")
@@ -109,8 +109,23 @@ class Seq:
             except FileNotFoundError:
                 print("FIle does not exist.")
 
+    def valid_filename_2(self,filename):
+        exit = False
+        while not exit:
+            #filename = input("What file do you want to open?:")
+            try:
+                filename = open("../P0/Session04/" + filename + ".txt", "r")
+                exit = True
+                return filename
+            except FileNotFoundError:
+                print(f"File {filename} does not exist.")
+                exit = True
+
     def seq_read_fasta(self, filename):
-        seq = open("../P0/Session04/" + filename + ".txt", "r").read()
-        seq = seq[seq.find("\n"):].replace("\n", "")
-        self.strbases = seq
+        try:
+            seq = open("../P0/Session04/" + filename + ".txt", "r").read()
+            seq = seq[seq.find("\n"):].replace("\n", "")
+            self.strbases = seq
+        except FileNotFoundError:
+            pass
 

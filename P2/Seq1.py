@@ -1,7 +1,7 @@
 class Seq:
     """A class for representing sequences"""
 
-    def __init__(self, strbases="NULL"):
+    def __init__(self, strbases = "NULL"):
         # Initialize the sequence with the value
         # passed as argument when creating the object
         self.strbases = strbases
@@ -34,6 +34,7 @@ class Seq:
                 valid = False
             i += 1
 
+
         return valid
 
     def __str__(self):
@@ -51,12 +52,19 @@ class Seq:
         return length
 
     def count_base(self):
-        A = self.strbases.count("A")
-        T = self.strbases.count("T")
-        C = self.strbases.count("C")
-        G = self.strbases.count("G")
+        A = 0
+        C = 0
+        G = 0
+        T = 0
+        if self.strbases != "ERROR" and self.strbases != "NULL":
+            A = self.strbases.count("A")
+            T = self.strbases.count("T")
+            C = self.strbases.count("C")
+            G = self.strbases.count("G")
+        else:
+            pass
 
-        return A, T, G, C
+        return A, C, T, G
 
     def count_base_dict(self):
         base_dict = {}
@@ -73,6 +81,7 @@ class Seq:
             pass
         return base_dict
 
+
     def reverse_string(self):
         reverse_str = ""
         if self.strbases != "ERROR" and self.strbases != "NULL":
@@ -88,34 +97,20 @@ class Seq:
         else:
             comp = self
         return comp
-
-    def valid_filename(self,filename):
+    @staticmethod
+    def valid_filename():
         exit = False
         while not exit:
-            #filename = input("What file do you want to open?:")
+            filename = input("What file do you want to open?:")
             try:
-                filename = open("../P0/Session04/" + filename + ".txt", "r")
+                f = open("../P0/Session04/" + filename + ".txt", "r")
                 exit = True
                 return filename
             except FileNotFoundError:
-                print("File does not exist.")
-
-    def valid_filename_2(self,filename):
-        exit = False
-        while not exit:
-            #filename = input("What file do you want to open?:")
-            try:
-                filename = open("../P0/Session04/" + filename + ".txt", "r")
-                exit = True
-                return filename
-            except FileNotFoundError:
-                print(f"File {filename} does not exist.")
-                exit = True
+                print("FIle does not exist.")
 
     def seq_read_fasta(self, filename):
-        try:
-            seq = open("../P0/Session04/" + filename + ".txt", "r").read()
-            seq = seq[seq.find("\n"):].replace("\n", "")
-            self.strbases = seq
-        except FileNotFoundError:
-            pass
+        seq = open("./sequences/" + filename + ".txt", "r").read()
+        seq = seq[seq.find("\n"):].replace("\n", "")
+        self.strbases = seq
+

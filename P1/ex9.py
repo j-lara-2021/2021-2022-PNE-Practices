@@ -1,15 +1,12 @@
 from Seq1 import Seq
 filename = Seq.valid_filename()
-sequence = Seq.seq_read_fasta(filename)
-sequence_list = [sequence]
-sequences = []
-for s in sequence_list:
-    if s == "":
-        sequences.append(Seq())
-    else:
-        sequences.append(Seq(s))
+sequence = Seq()
+sequence.seq_read_fasta(filename)
+sequences = [sequence]
+
 for i in range(0, len(sequences)):
-    print(f"Sequence {i + 1}: (Length: {Seq.len(sequences[i])} ) {sequences[i]} \n"
-          f"    Bases: {Seq.count_base_dict(sequences[i])}\n"
-          f"    Rev: {Seq.reverse_string(sequences[i])}\n"
-          f"    Comp: {Seq.comp_str(sequences[i])}")
+    #sequences[i].len()
+    print(f"Sequence {i + 1}: (Length: {sequences[i].len()} ) {sequences[i]} \n"
+          f"    Bases: {sequences[i].count_base_dict()}\n"
+          f"    Rev: {sequences[i].reverse_string()}\n"
+          f"    Comp: {sequences[i].comp_str()}")

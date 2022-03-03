@@ -4,5 +4,5 @@ s = "ADA"
 #print(Seq.count_base_dict(s))
 #print(Seq.reverse_string(s))
 #print(Seq.comp_str(s))
-f = Seq.valid_filename(s)
-sequence = Seq.seq_read_fasta(f)
+filename = Seq.valid_filename()
+sequence = Seq.seq_read_fasta(filename)
