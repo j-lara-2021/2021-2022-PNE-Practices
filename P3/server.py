@@ -1,6 +1,6 @@
 import socket
 import termcolor
-sequences = ["AAATTATATTAGGCCC", "AGGCTACTATATGGA", "AAGGGCACGGCGAGCGAG", "AGCTTAGTGTAGTAGATGATAG", "AGGGGAGGAGAGGAGTA"]
+sequences = ["ACCTCCTCTCCAGCAATGCCAACCCCAGTCCAGGCCCCCATCCGCCCAGGATCTCGATCA", "AAAAACATTAATCTGTGGCCTTTCTTTGCCATTTCCAACTCTGCCACCTCCATCGAACGA", "CAAGGTCCCCTTCTTCCTTTCCATTCCCGTCAGCTTCATTTCCCTAATCTCCGTACAAAT", "CCCTAGCCTGACTCCCTTTCCTTTCCATCCTCACCAGACGCCCGCATGCCGGACCTCAAA", "AGCGCAAACGCTAAAAACCGGTTGAGTTGACGCACGGAGAGAAGGGGTGTGTGGGTGGGT"]
 # -- Step 1: create the socket
 ls = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -49,27 +49,45 @@ while True:
 
         # -- We decode it for converting it
         # -- into a human-redeable string
-        msg = msg_raw.decode().replace("\n", "").strip()
-        termcolor.cprint(f"{msg} command!", "green")
+        msg = msg_raw.decode().replace("\n", "").strip().upper()
+
         splitted_command = msg.split(" ")
         cmd = splitted_command[0]
-
+        if cmd != "PING":
+            arg = splitted_command[1]
+        termcolor.cprint(f"{cmd}", "green")
         if cmd == "PING":
             response = "OK!\n"
             print(response)
+
         elif cmd == "GET":
-            arg = int(splitted_command[1])
-            response = sequences[arg]
+            arg = int(arg)
+            response = f"GET {arg}: " + sequences[arg]
+            print(response)
+
         elif cmd == "INFO":
-            arg = splitted_command[1]
-            print(f"sequence: {arg}")
+            print(f"New sequence created! \n")
             d = {"A": 0, "C": 0, "G": 0, "T": 0, "A%": 0, "C%": 0,"G%": 0, "T%": 0 }
             for b in arg:
                 d[b] += 1
-                d[b + "%"] = d[b] / len(arg) * 100
-            response = f" A: {d['A']} ({d['A%']} %)\n C: {d['C']} ({d['C%']} %)\n G: {d['G']} ({d['G%']} %)\n T: {d['T']} ({d['T%']} %)\n"
-            print(f"Total length: {len(arg)}")
+                d[b + "%"] = round((d[b] / len(arg) * 100),2)
+            response = f"Sequence: {arg}\nTotal length: {len(arg)}\n A: {d['A']} ({d['A%']} %)\n C: {d['C']} ({d['C%']} %)\n G: {d['G']} ({d['G%']} %)\n T: {d['T']} ({d['T%']} %)\n"
             print(response)
+
+        elif cmd == "COMP":
+            response = arg.replace('C', 'g').replace("G", "c").replace("A", "t").replace("T", "a").upper()
+            print(f"New sequence created! \n"
+            f"COMP {response}")
+        elif cmd == "REV":
+            response = arg[::-1]
+            print(f"New sequence created! \n"
+                  f"REV {response}")
+        elif cmd == "GENE":
+            f = open("./sequences/" + arg + ".txt", "r").read()
+            gene = f[f.find("\n"):].replace("\n", "")
+            response = f"GENE {arg}\n {gene}"
+            print(f"NULL Seq created \n"
+                  f"{response}")
         else:
 
             # -- Send a response message to the client
