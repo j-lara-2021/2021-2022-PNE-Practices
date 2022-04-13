@@ -1,15 +1,15 @@
 import http.server
 import socketserver
+import seq_functions as seq
 import termcolor
 PORT = 4876
 # -- This is for preventing the error: "Port already in use"
 socketserver.TCPServer.allow_reuse_address = True
-
+sequences = ["ATGAGCGAGGTTATA", "GGGATCGAGAGCTAGC", "ATGCTAGGGACCCC", "TAGCTAGTCAGCCCGGGTT", "GGGTTACTTATCAC"]
 class TestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
         route = self.path
-        sequences = ["ATGAGCGAGGTTATA", "GGGATCGAGAGCTAGC", "ATGCTAGGGACCCC", "TAGCTAGTCAGCCCGGGTT", "GGGTTACTTATCAC"]
         if route == "/":
             body = open("html/form-1.html", "r").read()
         elif route == "/favicon.ico":
@@ -17,17 +17,19 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
         else:
             try:
                 filename = route.split("=")
-                if len(filename) == 1:
-                    body = open("html/form-1.html", "r").read()
+                method = filename[-1].strip("/").upper()
+                if method == "PING":
+                    body = seq.ping(method)
+                elif method == "GET":
+                    body =  seq.get(filename,method,sequences)
+                elif method == "GENE":
+                    body = seq.gene(filename)
+                elif method == "INFO" or method == "COMP" or method == "REV":
+                    body = seq.operate(method,filename)
                 else:
-                    seq_num = filename[1].split("&")[1]
-                    filename = str(filename[-1]).strip("/")
-
-                    try:
-                        body = open("html/" + filename + ".html", "r").read()
-
-                    except FileNotFoundError:
-                        body = open("html/error.html", "r").read()
+                    body = open("html/error.html", "r").read()
+            except FileNotFoundError:
+                    body = open("html/error.html", "r").read()
             except IndexError:
                 body = open("html/error.html", "r").read()
 

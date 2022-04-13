@@ -68,6 +68,7 @@ while True:
         elif cmd == "INFO":
             print(f"New sequence created! \n")
             d = {"A": 0, "C": 0, "G": 0, "T": 0, "A%": 0, "C%": 0,"G%": 0, "T%": 0 }
+            print(f"idiota{arg}")
             for b in arg:
                 d[b] += 1
                 d[b + "%"] = round((d[b] / len(arg) * 100),2)
