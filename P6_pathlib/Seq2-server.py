@@ -6,9 +6,8 @@ import jinja2 as j
 from urllib.parse import parse_qs, urlparse
 
 HTML_FOLDER = "./html/"
-LIST_SEQUENCES = ["ACGTCCAGTAAA", "ACGTAGTTTTTAAACCC", "GGGTAAACTACG",
-                  "CGTAGTACGTA", "TGCATGCCGAT", "ATATATATATATATATATA"]
-LIST_GENES = ["ADA", "FRAT1", "FXN", "RNU5A", "U5"]
+LIST_SEQUENCES = sequences = ["ATGAGCGAGGTTATA", "GGGATCGAGAGCTAGC", "ATGCTAGGGACCCC", "TAGCTAGTCAGCCCGGGTT", "GGGTTACTTATCAC"]
+LIST_GENES = ["ADA", "FRAT1", "FXN", "RNU6_269P", "U5"]
 
 def read_html_file(filename):
     contents = Path(HTML_FOLDER + filename).read_text()
