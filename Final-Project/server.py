@@ -31,15 +31,46 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             url = urlparse(self.path)
             path = url.path
             arguments = parse_qs(url.query)
-
+            print(path)
             if self.path == "/":
                 contents = u.read_html_file("index.html").render()
             elif path == "/listSpecies":
-                n_species = arguments["number_species"]  # check what happens if input empty !!!
+                n_species = int(arguments["limit"][0])  # check what happens if input empty !!!
                 dict_answer = u.make_ensmbl_request("/info/species", ARGUMENT)  # + "&" + "species=homo_sapiens"
                 list_species = dict_answer["species"]
-                list_species = list_species[0:int(n_species)]
-                content = u.read_html_file("html/listSpecies.html").render(context={"species": list_species})
+                length_list = []
+                for d in list_species:
+                    length = d["common_name"]
+                    length_list.append(length)
+                length = len(length_list)
+                list_species = list_species[0:n_species]
+                name_list = []
+                for d in list_species:
+                    v = d["common_name"]
+                    name_list.append(v)
+
+                contents = u.read_html_file("listSpecies.html").render(context={"length": length,"species": name_list, "limit": n_species})
+
+            elif path == "/karyotype":
+
+                specie = arguments["karyotype"][0]  # check what happens if input empty !!!
+                dict_answer = u.make_ensmbl_request("info/assembly/" + specie, ARGUMENT)  # + "&" + "species=homo_sapiens"
+                karyotypes = dict_answer["karyotype"]
+                contents = u.read_html_file("karyotype.html").render(context={"karyotypes": karyotypes})
+
+            elif path == "/chromosomeLength":
+                specie = arguments["specie"][0]
+                n_chromosome = int(arguments["length"][0])# check what happens if input empty !!!
+                dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
+                                                    ARGUMENT)  # + "&" + "species=homo_sapiens"
+                for d in dict_answer["top_level_region"]:
+                    for k,v in d.items():
+                        if k == "name" and v == str(n_chromosome):
+                            length = d["length"]
+                        else:
+                            pass
+
+                contents = u.read_html_file("chromosomeLength.html").render(context={"length": length})
 
             else:
                 contents = open("html/error.html", "r").read()
