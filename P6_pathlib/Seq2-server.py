@@ -105,6 +105,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 "info": info_operation(sequence),
                 "comp": comp_str(sequence)
             })
+
         else:
             contents = open("html/error.html", "r").read()
 

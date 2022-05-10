@@ -17,7 +17,10 @@ socketserver.TCPServer.allow_reuse_address = True
 # Connect with the server
 conn = http.client.HTTPConnection(SERVER)
 
-
+id_dict = {"FRAT1": "ENSG00000165879", "ADA": "ENSG00000196839", "FXN": "ENSG00000165060",
+          "RNU6_269P": "ENSG00000212379", "MIR633": "ENSG00000207552", "TTTY4C": "ENSG00000228296",
+           "RBMY2YP": "ENSG00000227633", "FGFR3": "ENSG00000068078", "KDR": "ENSG00000128052",
+           "ANK2": "ENSG00000145362"}
 class TestHandler(http.server.BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -71,6 +74,20 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                             pass
 
                 contents = u.read_html_file("chromosomeLength.html").render(context={"length": length})
+            elif path == "/gene":
+                gene = arguments["gene"][0]
+                gene_id = id_dict[gene]
+                dict_answer = u.make_ensmbl_request("/sequence/id/" + gene_id, ARGUMENT)
+                print(dict_answer)
+                geneseq = dict_answer["seq"]
+                contents = u.read_html_file("gene.html").render(context={"gene": gene, "geneseq": geneseq})
+                """chromosome:GRCh38:10(number of chromosome):start:end:1
+                name = position 2(firstnumber)
+
+                FOr geneList is phenotype species region. Region is numberofchromosome:start-end:1
+                CHECKBOX"""
+
+
 
             else:
                 contents = open("html/error.html", "r").read()
