@@ -93,6 +93,26 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                                                          "genend": genend, "genelength": genelength, "geneid": geneid,
                                                                          "chromosome_name": chromosome_name, "total_length": total_length,
                                                                          "base_perc": base_perc})
+
+            elif path == "/chromosome":
+                chromosome = arguments["chromosome"][0]
+                start = arguments["start"][0]
+                end = arguments["end"][0]
+                dict_answer = u.make_ensmbl_request("/phenotype/region/homo_sapiens/" + chromosome +":" + start + "-" + end, ARGUMENT)
+                genes_list = []
+                for d in dict_answer:
+                    dictionary = d["phenotype_associations"]
+                    try:
+                        for i in dictionary:
+                            print(i["attributes"]["associated_gene"])
+                            genes_list.append(i["attributes"]["associated_gene"])
+                    except KeyError:
+                        pass
+                contents = u.read_html_file("chromosome.html").render(context={"chromosome": chromosome, "start": start, "end": end
+                                                                         ,"genes_list": genes_list})
+
+
+
                 """chromosome:GRCh38:10(number of chromosome):start:end:1
                 name = position 2(firstnumber)
 
