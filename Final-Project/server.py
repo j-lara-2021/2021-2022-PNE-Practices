@@ -6,6 +6,7 @@ import http.server
 import termcolor
 from pathlib import Path
 import jinja2 as j
+from utilities import Seq
 from urllib.parse import parse_qs, urlparse
 ARGUMENT = "?content-type=application/json"
 SERVER = 'rest.ensembl.org'
@@ -78,9 +79,20 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 gene = arguments["gene"][0]
                 gene_id = id_dict[gene]
                 dict_answer = u.make_ensmbl_request("/sequence/id/" + gene_id, ARGUMENT)
-                print(dict_answer)
                 geneseq = dict_answer["seq"]
-                contents = u.read_html_file("gene.html").render(context={"gene": gene, "geneseq": geneseq})
+                geneinfo = dict_answer["desc"].split(":")
+                genestart = int(geneinfo[3])
+                genend = int(geneinfo[4])
+                genelength = genend - genestart
+                geneid = geneinfo[2]
+                chromosome_name = geneinfo[1]
+                sequence = Seq(geneseq)
+                base_perc, total_length = Seq.base_perc(sequence.count_base_dict())
+
+                contents = u.read_html_file("gene.html").render(context={"gene": gene, "geneseq": geneseq, "genestart": genestart,
+                                                                         "genend": genend, "genelength": genelength, "geneid": geneid,
+                                                                         "chromosome_name": chromosome_name, "total_length": total_length,
+                                                                         "base_perc": base_perc})
                 """chromosome:GRCh38:10(number of chromosome):start:end:1
                 name = position 2(firstnumber)
 

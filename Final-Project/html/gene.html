@@ -6,7 +6,17 @@
 </head>
 <body style="background-color: #B6D0E2;">
 <textarea>Gene {{context.gene}} with sequence: {{ context.geneseq }}</textarea>
-<br>
+<p>Gene Info:</p>
+<ul><li>Start: {{context.genestart}}</li>
+<li>End: {{context.genend}}</li>
+<li>Length: {{context.genelength}}</li>
+<li>ID: {{context.geneid}}</li>
+<li>Chromosome Name: {{context.chromosome_name}}</li></ul>
+<p>Calculations:</p>
+<ul><li>Length: {{context.total_length}}</li>
+    {% for k,v in context.base_perc.items() %}
+<li>Percentage of base {{k}}:{{v}}</li>
+{% endfor %}</ul>
 <a href = "/" >Main page</a>
 
 </body>
