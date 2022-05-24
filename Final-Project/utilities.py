@@ -59,7 +59,8 @@ class Seq:
 
     def base_perc(dict):
         perc_dict = {"A": 0, "C": 0, "G": 0, "T": 0}
-        Sum = sum(dict.values())
+        total = sum(dict.values())
         for k, v in dict.items():
-            perc_dict[k] = str(round(v * 100 / Sum, 2)) + "%"
-        return perc_dict ,sum
+            perc_dict[k] = str(round(v * 100 / total, 2)) + "%"
+
+        return perc_dict ,total

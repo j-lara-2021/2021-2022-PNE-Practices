@@ -5,8 +5,6 @@ import socket
 import utilities as u
 import http.server
 import termcolor
-from pathlib import Path
-import jinja2 as j
 from utilities import Seq
 from urllib.parse import parse_qs, urlparse
 
@@ -50,8 +48,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             if self.path == "/":
                 contents = u.read_html_file("index.html").render()
             elif path == "/listSpecies":
-
-                n_species = int(arguments["limit"][0])  # check what happens if input empty !!!
                 dict_answer = u.make_ensmbl_request("/info/species", ARGUMENT)  # + "&" + "species=homo_sapiens"
                 list_species = dict_answer["species"]
                 length_list = []
@@ -59,94 +55,140 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     length = d["common_name"]
                     length_list.append(length)
                 length = len(length_list)
-                list_species = list_species[0:n_species]
-                name_list = []
-                for d in list_species:
-                    v = d["common_name"]
-                    name_list.append(v)
-                banana = {"length": length, "species": name_list, "limit": n_species}
+
                 try:
-                    trying = arguments["json"][0]
-                    contents = banana
+                    if 0 <= int(arguments["limit"][0]) <= length:
+                        n_species = int(arguments["limit"][0])  # check what happens if input empty !!!
+
+                        list_species = list_species[0:n_species]
+                        name_list = []
+                        for d in list_species:
+                            v = d["common_name"]
+                            name_list.append(v)
+                        content_dict = {"length": length, "species": name_list, "limit": n_species}
+
+                        contents = u.read_html_file("listSpecies.html").render(
+                                context=content_dict)
+                    else:
+                        contents = u.read_html_file("error.html").render(
+                            context={"error": "Please enter an integer number between 0 and "+ str(length)})
                 except KeyError:
-                    contents = u.read_html_file("listSpecies.html").render(
-                        context=banana)
+                    contents = u.read_html_file("error.html").render(context={"error":"Please enter an integer number"})
+
+
 
             elif path == "/karyotype":
-
-                specie = arguments["karyotype"][0]  # check what happens if input empty !!!
-                dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
-                                                    ARGUMENT)  # + "&" + "species=homo_sapiens"
-                karyotypes = dict_answer["karyotype"]
-                contents = u.read_html_file("karyotype.html").render(context={"karyotypes": karyotypes})
+                try:
+                    specie = arguments["karyotype"][0]  # check what happens if input empty !!!
+                    dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
+                                                        ARGUMENT)  # + "&" + "species=homo_sapiens"
+                    karyotypes = dict_answer["karyotype"]
+                    content_dict = {"karyotypes": karyotypes}
+                    contents = u.read_html_file("karyotype.html").render(context=content_dict)
+                except KeyError:
+                    contents = u.read_html_file("error.html").render(context={"error":"Please enter a valid species"})
 
             elif path == "/chromosomeLength":
-                specie = arguments["specie"][0]
-                n_chromosome = int(arguments["length"][0])  # check what happens if input empty !!!
-                dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
-                                                    ARGUMENT)  # + "&" + "species=homo_sapiens"
-                for d in dict_answer["top_level_region"]:
-                    for k, v in d.items():
-                        if k == "name" and v == str(n_chromosome):
-                            length = d["length"]
-                        else:
-                            pass
+                try:
+                    specie = arguments["specie"][0]
 
-                contents = u.read_html_file("chromosomeLength.html").render(context={"length": length})
+                    n_chromosome = arguments["length"][0]  # check what happens if input empty !!!
+                    dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
+                                                        ARGUMENT)
+                    try:
+                        for d in dict_answer["top_level_region"]:
+                            for k, v in d.items():
+                                if k == "name" and v == str(n_chromosome):
+                                    length = d["length"]
+                                else:
+                                    pass
+                        content_dict = {"length": length}
+                        contents = u.read_html_file("chromosomeLength.html").render(context=content_dict)
+                    except UnboundLocalError:
+                        contents = u.read_html_file("error.html").render(
+                            context={"error": "Please enter a valid chromosome"})
+                except KeyError:
+                    contents = u.read_html_file("error.html").render(
+                        context={"error": "Please enter valid data"})
             elif path == "/gene":
-                gene = arguments["gene"][0]
-                gene_id = id_dict[gene]
-                dict_answer = u.make_ensmbl_request("/sequence/id/" + gene_id, ARGUMENT)
-                geneseq = dict_answer["seq"]
-                geneinfo = dict_answer["desc"].split(":")
-                genestart = int(geneinfo[3])
-                genend = int(geneinfo[4])
-                genelength = genend - genestart
-                geneid = geneinfo[2]
-                chromosome_name = geneinfo[1]
-                sequence = Seq(geneseq)
-                base_perc, total_length = Seq.base_perc(sequence.count_base_dict())
-
-                contents = u.read_html_file("gene.html").render(
-                    context={"gene": gene, "geneseq": geneseq, "genestart": genestart,
-                             "genend": genend, "genelength": genelength, "geneid": geneid,
-                             "chromosome_name": chromosome_name, "total_length": total_length,
-                             "base_perc": base_perc})
+                try:
+                    gene = arguments["gene"][0]
+                    gene_id = id_dict[gene]
+                    dict_answer = u.make_ensmbl_request("/sequence/id/" + gene_id, ARGUMENT)
+                    geneseq = dict_answer["seq"]
+                    geneinfo = dict_answer["desc"].split(":")
+                    genestart = int(geneinfo[3])
+                    genend = int(geneinfo[4])
+                    genelength = genend - genestart
+                    geneid = geneinfo[2]
+                    chromosome_name = geneinfo[1]
+                    sequence = Seq(geneseq)
+                    base_perc, total_length = Seq.base_perc(sequence.count_base_dict())
+                    content_dict= {"gene": gene, "geneseq": geneseq, "genestart": genestart,
+                                 "genend": genend, "genelength": genelength, "geneid": geneid,
+                                 "chromosome_name": chromosome_name, "total_length": total_length,
+                                 "base_perc": base_perc}
+                    contents = u.read_html_file("gene.html").render(
+                        context=content_dict)
+                except KeyError:
+                    contents = u.read_html_file("error.html").render(
+                        context={"error": "Please enter a valid gene"})
 
             elif path == "/chromosome":
-                chromosome = arguments["chromosome"][0]
-                start = arguments["start"][0]
-                end = arguments["end"][0]
-                dict_answer = u.make_ensmbl_request(
-                    "/phenotype/region/homo_sapiens/" + chromosome + ":" + start + "-" + end, ARGUMENT)
-                genes_list = []
-                for d in dict_answer:
-                    dictionary = d["phenotype_associations"]
-                    try:
-                        for i in dictionary:
-                            print(i["attributes"]["associated_gene"])
-                            genes_list.append(i["attributes"]["associated_gene"])
-                    except KeyError:
-                        pass
-                if genes_list == []:
-                    genes_list.append("There are no genes in that region")
-                contents = u.read_html_file("chromosome.html").render(
-                    context={"chromosome": chromosome, "start": start, "end": end
-                        , "genes_list": genes_list})
+                try:
+                    chromosome = arguments["chromosome"][0]
+                    start = int(arguments["start"][0])
+                    end = int(arguments["end"][0])
+                    if 0 <= start < end:
+                        dict_answer = u.make_ensmbl_request(
+                            "/phenotype/region/homo_sapiens/" + chromosome + ":" + str(start) + "-" + str(end), ARGUMENT)
+                        print(dict_answer)
+                        genes_list = []
+                        if dict_answer == []:
+                            genes_list.append("There are no genes in that region")
+                            content_dict = {"chromosome": chromosome, "start": start, "end": end
+                                , "genes_list": genes_list}
+                            contents = u.read_html_file("chromosome.html").render(
+                                context=content_dict)
 
-                """FOr advnaced. checkbox to include json=1. If included, client prints json file, else act normal.
-                """
+                        else:
+                            try:
+                                if type(dict_answer) is dict:
+                                    check = dict_answer["error"]
+                                else:
+                                    check =  dict_answer[0]["error"]
 
-                """chromosome:GRCh38:10(number of chromosome):start:end:1
-                name = position 2(firstnumber)
+                                contents = u.read_html_file("error.html").render(
+                                    context={"error": "Please enter valid chromosome."})
+                            except KeyError:
+                                for d in dict_answer:
+                                    dictionary = d["phenotype_associations"]
+                                    try:
+                                        for i in dictionary:
+                                            print(i["attributes"]["associated_gene"])
+                                            genes_list.append(i["attributes"]["associated_gene"])
+                                    except KeyError:
+                                        pass
+                                if genes_list == []:
+                                    genes_list.append("There are no genes in that region")
+                                content_dict= {"chromosome": chromosome, "start": start, "end": end
+                                        , "genes_list": genes_list}
+                                contents = u.read_html_file("chromosome.html").render(
+                                    context=content_dict)
 
-                FOr geneList is phenotype species region. Region is numberofchromosome:start-end:1
-                CHECKBOX"""
-
-
+                    else:
+                        contents = u.read_html_file("error.html").render(
+                            context={"error": "Please enter valid integer numbers. Start must be smaller than end and both must be positive"})
+                except KeyError:
+                    contents = u.read_html_file("error.html").render(
+                        context={"error": "Please enter valid data"})
+                except ValueError:
+                    contents = u.read_html_file("error.html").render(
+                        context={"error": "Please enter valid integer numbers."})
 
             else:
-                contents = open("html/error.html", "r").read()
+                contents = u.read_html_file("error.html").render(context={
+                    "error": "Sorry, the information you entered is not available in ensmlb"})
 
             # Generating the response message
             self.send_response(200)  # -- Status line: OK!
@@ -155,6 +197,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             try:
                 trying = arguments["json"][0]
+                contents = content_dict
                 contents = json.dumps(contents)
                 self.send_header('Content-Type', 'application/json')
                 self.send_header('Content-Length', len(contents.encode()))
