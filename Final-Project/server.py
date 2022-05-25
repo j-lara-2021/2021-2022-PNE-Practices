@@ -165,7 +165,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                     dictionary = d["phenotype_associations"]
                                     try:
                                         for i in dictionary:
-                                            print(i["attributes"]["associated_gene"])
                                             genes_list.append(i["attributes"]["associated_gene"])
                                     except KeyError:
                                         pass
