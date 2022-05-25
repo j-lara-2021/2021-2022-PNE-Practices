@@ -19,7 +19,7 @@ socketserver.TCPServer.allow_reuse_address = True
 conn = http.client.HTTPConnection(SERVER)
 
 id_dict = {"FRAT1": "ENSG00000165879", "ADA": "ENSG00000196839", "FXN": "ENSG00000165060",
-           "RNU6_269P": "ENSG00000212379", "MIR633": "ENSG00000207552", "TTTY4C": "ENSG00000228296",
+           "RNU6_269P": "ENSG00000212379", "MIR633": "ENSG00000207552", "TTTY4C": "ENSG00000226906",
            "RBMY2YP": "ENSG00000227633", "FGFR3": "ENSG00000068078", "KDR": "ENSG00000128052",
            "ANK2": "ENSG00000145362"}
 
@@ -90,7 +90,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
 
             elif path == "/chromosomeLength":
                 try:
-                    specie = arguments["specie"][0]
+                    specie = arguments["specie"][0].replace(" ", "_")
 
                     n_chromosome = arguments["length"][0]  # check what happens if input empty !!!
                     dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
@@ -102,7 +102,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                                     length = d["length"]
                                 else:
                                     pass
-                        content_dict = {"length": length}
+                        content_dict = {"length": length, "chromosome": n_chromosome, "specie": specie}
                         contents = u.read_html_file("chromosomeLength.html").render(context=content_dict)
                     except UnboundLocalError:
                         contents = u.read_html_file("error.html").render(
@@ -142,7 +142,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     if 0 <= start < end:
                         dict_answer = u.make_ensmbl_request(
                             "/phenotype/region/homo_sapiens/" + chromosome + ":" + str(start) + "-" + str(end), ARGUMENT)
-                        print(dict_answer)
+
                         genes_list = []
                         if dict_answer == []:
                             genes_list.append("There are no genes in that region")
@@ -214,12 +214,6 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
             exit()
 
         return
-
-
-"""cs.send(response.encode())
-
-# -- Close the data socket
-cs.close()"""
 
 Handler = TestHandler
 
