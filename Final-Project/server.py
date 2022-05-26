@@ -83,7 +83,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                     dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
                                                         ARGUMENT)  # + "&" + "species=homo_sapiens"
                     karyotypes = dict_answer["karyotype"]
-                    content_dict = {"karyotypes": karyotypes}
+                    content_dict = {"specie":specie, "karyotypes": karyotypes}
                     contents = u.read_html_file("karyotype.html").render(context=content_dict)
                 except KeyError:
                     contents = u.read_html_file("error.html").render(context={"error":"Please enter a valid species"})
@@ -92,7 +92,7 @@ class TestHandler(http.server.BaseHTTPRequestHandler):
                 try:
                     specie = arguments["specie"][0].replace(" ", "_")
 
-                    n_chromosome = arguments["length"][0]  # check what happens if input empty !!!
+                    n_chromosome = arguments["length"][0].upper()  # check what happens if input empty !!!
                     dict_answer = u.make_ensmbl_request("info/assembly/" + specie,
                                                         ARGUMENT)
                     try:
